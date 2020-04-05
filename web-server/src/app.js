@@ -1,62 +1,96 @@
-const path = require('path')
-const express = require('express')
-const hbs = require('hbs')
-
+const path = require("path")
+const forecast = require("./utils/forecast")
+const geocode = require("./utils/geocode")
+const express = require("express")
+const hbs = require("hbs")
 const app = express()
-const publicDirectoryPath = path.join(__dirname, '../public')
-//! Defined Express view Path
-const viewsPath = path.join(__dirname, '../templates/views')
-//! Partials Path
-const partialPath = path.join(__dirname, '../templates/partials')
 
+// Define paths for Express config
+const publicDirectoryPath = path.join(__dirname, "../public")
+const viewsPath = path.join(__dirname, "../templates/views")
+const partialsPath = path.join(__dirname, "../templates/partials")
 
-//! Seting param for app.set
-app.set('view engine', 'hbs')
-app.set('views', viewsPath)
-//!Static File path
+// Setup handlebars engine and views location
+app.set("view engine", "hbs")
+app.set("views", viewsPath)
+hbs.registerPartials(partialsPath)
+
+// Setup static directory to serve
 app.use(express.static(publicDirectoryPath))
-//! hbs partial folder path
-hbs.registerPartials(partialPath)
 
-
-app.get('',(req, res)=>{
-    res.render('index',{
-        title: 'Weather app',
-        name: 'XXX'
-    })
-})
-app.get('/about',(req, res)=>{
-    res.render('about', {
-        title: 'About'
-    })
-})
-app.get('/help',(req, res)=>{
-    res.render('help', {
-        helpText: "This is the help text",
-        title: 'Help',
-        name: 'Dip'
-    })
-})
-//weather route
-app.get('/weather', (req,res)=>{
-    res.send({
-        forecast: 'It is raining',
-        location: 'Dhaka'
-    })
+app.get("", (req, res) => {
+  res.render("index", {
+    title: "Weather",
+    name: "Dip",
+  })
 })
 
-app.get('/help/*', (req, res)=>{
-    res.render('help404')
+app.get("/about", (req, res) => {
+  res.render("about", {
+    title: "About Me",
+    name: "Dip",
+  })
 })
 
-app.get('*',(req,res)=>{
-    res.render('404page', {
-        errorMessage: 'Page not found',
-        errorType: '404'
+app.get("/help", (req, res) => {
+  res.render("help", {
+    helpText: "This is some helpful text.",
+    title: "Help",
+    name: "Dip",
+  })
+})
+
+app.get("/weather", (req, res) => {
+  if (!req.query.address) {
+    return res.send({
+      error: "Please add an address for response",
     })
+  }
+  geocode(req.query.address, (error, {
+    latitude,
+    longitude,
+    location
+  } = {}) => {
+    if (error) {
+      return res.send({error})
+    }
+    forecast(latitude, longitude, (error, forecastData) => {
+      if (error) {
+        return res.send(error)
+      }
+
+      res.send({
+        address: req.query.address,
+        location,
+        forecast: forecastData
+      })
+    })
+  })
 })
 
-//server up code
-app.listen(3000, ()=>{
-    console.log('Server is Up in port 3000')
+app.get("/product", (req, res) => {
+  console.log(req.query)
+  res.send({
+    product: [],
+  })
+})
+
+app.get("/help/*", (req, res) => {
+  res.render("404", {
+    title: "404",
+    name: "Dip",
+    errorMessage: "Help article not found.",
+  })
+})
+
+app.get("*", (req, res) => {
+  res.render("404", {
+    title: "404",
+    name: "Dip",
+    errorMessage: "Page not found.",
+  })
+})
+
+app.listen(3000, () => {
+  console.log("Server is up on port 3000.")
 })
