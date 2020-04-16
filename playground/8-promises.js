@@ -1,14 +1,24 @@
-const doWorkdPromise = new Promise((resolve, reject)=>{
-    setTimeout(()=>{
-        reject('Unable to fectch data')
-        // resolve([1,7,4,7])
-    }, 2000)
-})
+const add = (a, b) => {
+    return new Promise((resolve, reject) => {
+        setTimeout(() => {
+            resolve(a + b)
+        }, 2000)
+    })
+}
 
-doWorkdPromise.then((result)=>{
-    console.log('Success',result)
-    
-}).catch((error)=>{
-    console.log('Error:', error)
-    
+// add(1,2).then((sum)=>{
+//     console.log(sum)
+
+// }).catch((e)=>{
+//     console.log(e)
+
+// })
+
+add(1, 2).then((sum) => {
+    console.log(sum)
+    return add(sum, 4)
+}).then((sum2) => {
+    console.log(sum2)
+}).catch((e) => {
+    console.log(e)
 })

@@ -1,1 +1,1 @@
-/Users/Anarchy/mongodb/bin/mongod.exe --dbpath=/Users/Anarchy/mongodb-data
+c:/Users/Anarchy/mongodb/bin/mongod.exe --dbpath=c:/Users/Anarchy/mongodb-data

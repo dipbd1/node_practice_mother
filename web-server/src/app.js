@@ -54,7 +54,9 @@ app.get("/weather", (req, res) => {
     location
   } = {}) => {
     if (error) {
-      return res.send({error})
+      return res.send({
+        error
+      })
     }
     forecast(latitude, longitude, (error, forecastData) => {
       if (error) {
@@ -94,5 +96,5 @@ app.get("*", (req, res) => {
 })
 
 app.listen(port, () => {
-  console.log("Server is up on port "+port+".")
+  console.log("Server is up on port " + port + ".")
 })
